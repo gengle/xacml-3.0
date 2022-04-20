@@ -4,12 +4,79 @@
  * This project uses @Incubating APIs which are subject to change.
  */
 
-plugins {
-    // Support convention plugins written in Groovy. Convention plugins are build scripts in 'src/main' that automatically become available as plugins in the main build.
-    id 'groovy-gradle-plugin'
+apply plugin: 'java' // adds 'test' task
+
+test { 
+  
+   // explicitly include or exclude tests
+   include 'org/foo/**'
+   exclude 'org/boo/**'
+
+   testLogging.showStandardStreams = true
+
+  // set heap size for the test JVM(s)
+  minHeapSize = "128m"
+  maxHeapSize = "512m"
+
+   // Fail the 'test' task on the first test failure
+  failFast = true
+
+  // set JVM arguments for the test JVM(s)
+  jvmArgs '-XX:MaxPermSize=256m'
+
 }
 
-repositories {
-    // Use the plugin portal to apply community plugins in convention plugins.
-    gradlePluginPortal()
+test {
+
+    onOutput { descriptor, event ->
+       if (event.destination == TestOutputEvent.Destination.StdErr) {
+           logger.error("Test: " + descriptor + ", error: " + event.message)
+       }
+    }
+
+    useJUnitPlatform {
+        exclude '**/*IT.class'
+        excludeTags 'IT', "slow"
+    }
+
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+
+    //void removeTestListener(TestListener listener);
+    
+    //useJUnitPlatform {
+    //   excludeTags 'IT', "slow"
+    //}
+
+    //testLogging {
+    //    events "passed", "skipped", "failed"
+    //}
+
 }
+
+task integrationTest(type: LoggedTests) {
+   
+    useJUnitPlatform {
+        includeTags 'IT'
+    }
+}
+
+//task slowTests(type: LoggedTests) {
+//    
+//    useJUnitPlatform {
+//        includeTags 'slow'
+//    }
+//}
+
+class LoggedTests extends Test {
+    
+    LoggedTests() {
+        testLogging {
+            events "passed", "skipped", "failed"
+        }
+    }
+}
+
+
+
