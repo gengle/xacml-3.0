@@ -74,7 +74,7 @@
         <version.junit>4.13.2</version.junit>
         <version.log4j>2.11.0</version.log4j>
         <version.xmlapi>1.4.01</version.xmlapi>
-        <version.assertj>3.19.0</version.assertj>
+        <version.assertj>3.27.7</version.assertj>
     </properties>
 
     <profiles>
